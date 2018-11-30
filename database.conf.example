@@ -1,0 +1,11 @@
+[from]
+host='localhost'
+user='user'
+password='password'
+db='database'
+
+[to]
+host='localhost'
+user='user'
+password='password'
+db='database'

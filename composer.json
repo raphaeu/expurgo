@@ -1,0 +1,22 @@
+{
+  "name": "zeus/expurgo",
+  "description": "Expurgar dados antigos db mysql",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Rafael Aguiar",
+      "email": "raphaeu.aguiar@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "raphaeu\\": "src/"
+    }
+  },
+  "require": {
+    "raphaeu/colorize": "^1.0",
+    "phpunit/php-timer": "^2.0",
+    "raphaeu/parse_file": "^1.0"
+  }
+}

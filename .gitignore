@@ -1,0 +1,7 @@
+.idea/
+vendor/
+config.ini
+composer.lock
+dump_*
+database.conf
+expurgo.log
