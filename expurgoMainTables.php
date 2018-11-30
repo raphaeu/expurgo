@@ -51,8 +51,8 @@ foreach ($tables as $table)
         $expurgo = new Expurgo($table, $databaseFrom, $databaseTo);
 
         $expurgo->setFileDump("{$date}_{$table->name}.sql");
-        $expurgo->setDateTimeStart("{$date} 12:13:00");
-        $expurgo->setDateTimeEnd("{$date} 12:15:59");
+        $expurgo->setDateTimeStart("{$date} 00:00:00");
+        $expurgo->setDateTimeEnd("{$date} 23:59:59");
 
         $expurgo->go();
     }catch (Exception $e){
