@@ -50,13 +50,13 @@ foreach ($tables as $table)
 
         $expurgo = new Expurgo($table, $databaseFrom, $databaseTo);
 
-        $expurgo->setFileDump("{$date}_{$table->name}.sql");
+        $expurgo->setFileDump(ParseFile::get('files', 'dump')."/{$date}_{$table->name}.sql");
         $expurgo->setDateTimeStart("{$date} 00:00:00");
         $expurgo->setDateTimeEnd("{$date} 23:59:59");
 
         $expurgo->go();
     }catch (Exception $e){
-        file_put_contents("./expurgo.log",PHP_EOL."[".date('Y-m-d H:i:s'). "][{$table->name}] ". $e->getMessage() , FILE_APPEND);
+        file_put_contents(ParseFile::get('files', 'log'),PHP_EOL."[".date('Y-m-d H:i:s'). "][{$table->name}] ". $e->getMessage() , FILE_APPEND);
         echo ("Erro:" .$e->getMessage());
     }
 
