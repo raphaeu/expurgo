@@ -146,7 +146,7 @@ class Expurgo
 
     private function makeDump($firstIdRegister, $lastIdRegister)
     {
-        shell_exec('export MYSQL_PWD='.$this->dbFrom->password.' && mysqldump -h '.$this->dbFrom->host.' -u '.$this->dbFrom->user.' '.$this->dbFrom->db.' '.$this->table->name.' --quick  --no-create-info --single-transaction=TRUE --where="'.$this->table->id.' >= '.$firstIdRegister.' and '.$this->table->id.' <= '.$lastIdRegister.'"  >  '.$this->getFileDump());
+        shell_exec('export MYSQL_PWD='.$this->dbFrom->password.' && mysqldump -h '.$this->dbFrom->host.' -u '.$this->dbFrom->user.' '.$this->dbFrom->db.' '.$this->table->name.' --quick  --no-create-info --single-transaction --where="'.$this->table->id.' >= '.$firstIdRegister.' and '.$this->table->id.' <= '.$lastIdRegister.'"  >  '.$this->getFileDump());
     }
 
 
@@ -200,6 +200,7 @@ class Expurgo
         } else {
             throw new \Exception("Erro! Não foi informado nome da tabela para o expurgo!");
         }
+
     }
 
 

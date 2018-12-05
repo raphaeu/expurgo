@@ -9,3 +9,8 @@ host='localhost'
 user='user'
 password='password'
 db='database'
+
+
+[files]
+log = '/var/log/expurgo.log'
+dump = '/expurgo'
