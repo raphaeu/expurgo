@@ -20,7 +20,9 @@ use \raphaeu\Colorize;
 
 ParseFile::setFile('database.conf');
 
-$date = date('Y-m-d');
+
+
+$date = date('Y-m-d', strtotime("-1 days"));
 $databaseFrom = new Database(ParseFile::get('from', 'host'), ParseFile::get('from', 'user'), ParseFile::get('from', 'password'), ParseFile::get('from', 'db'));
 $databaseTo = new Database(ParseFile::get('to', 'host'), ParseFile::get('to', 'user'), ParseFile::get('to', 'password'), ParseFile::get('to', 'db'));
 
