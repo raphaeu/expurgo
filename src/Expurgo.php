@@ -41,39 +41,34 @@ class Expurgo
         //verifica id do ultimo registro
         echo('[    ] Verificando ultimo ID');
 
-        $registersFrom = $this->dbFrom->connect()->query("SELECT {$this->table->id} FROM {$this->table->name} where {$this->table->fieldDateTime} >= '{$this->dateTimeStart}' and {$this->table->fieldDateTime} <= '{$this->dateTimeEnd}'")->fetchAll();
 
-        $firstIdRegister = $lastIdRegister = $firstIdRegister = $totalRegister  = 0;
-        $ids = [];
-        //montando array de ids a serem insertidos e id do ultimo registro
-        foreach ($registersFrom as $register)
-        {
-            if ($firstIdRegister == 0) $firstIdRegister = $register[$this->table->id];
-            if ($register[$this->table->id] > $lastIdRegister) $lastIdRegister = $register[$this->table->id];
-            if ($register[$this->table->id] < $firstIdRegister) $firstIdRegister = $register[$this->table->id];
-            $ids[] = $register[$this->table->id];
-            $totalRegister++;
-        }
-        echo("(".Colorize::bold().$firstIdRegister.Colorize::clear()."/".Colorize::bold().$lastIdRegister.Colorize::clear().") | Total register: ".Colorize::bold().$totalRegister.Colorize::clear()."  \r[ ".Colorize::green()."OK".Colorize::clear()." ] " . PHP_EOL);
+        $registersFrom = $this->dbFrom->connect()->query($x= "SELECT min({$this->table->id}) as first_id, max({$this->table->id})  as last_id, count({$this->table->id}) as total FROM {$this->table->name} where {$this->table->fieldDateTime} >= '{$this->dateTimeStart}' and {$this->table->fieldDateTime} <= '{$this->dateTimeEnd}'")->fetchObject();
 
-        if (count($ids ) > 0)
+
+        $first_id = @$registersFrom->first_id;
+        $last_id = @$registersFrom->last_id;
+        $total  = @$registersFrom->total;
+
+        if ($total > 0)
         {
+            echo("(".Colorize::bold().$first_id.Colorize::clear()."/".Colorize::bold().$last_id.Colorize::clear().") | Total register: ".Colorize::bold().$total.Colorize::clear()."  \r[ ".Colorize::green()."OK".Colorize::clear()." ] " . PHP_EOL);
+
             echo('[    ] Verificando itens no destino ');
-            $idOks = $this->checkDumpImported($firstIdRegister, $lastIdRegister);
-            echo (" | Total ".Colorize::bold().count($idOks).Colorize::clear()."\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+            $imported = $this->checkDumpImported($first_id, $last_id);
+            echo (" | Total ".Colorize::bold().$imported->total.Colorize::clear()."\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
 
-            if (count($idOks) > 0 )
+            if ($imported->total > 0 )
             {
                 echo('[    ] Excluindo itens ja expurgados anteriormente. ');
-                $this->deleteDump($ids, $idOks, $firstIdRegister,$lastIdRegister );
-                echo (" | Excluidos ".count($idOks)."\r[ OK ]". PHP_EOL);
+                $this->deleteDump($imported->first_id,$imported->last_id);
+                echo (" | Excluidos {$imported->total} ({$imported->first_id}/{$imported->last_id}) \r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
             }
 
             //verifica se sobrou dados a serem expurgado
-            if ((count($ids) > count($idOks)) and count($ids) > 0)
+            if ($total > $imported->total )
             {
                 echo('[    ] Gerando dump da tabela');
-                $this->makeDump($firstIdRegister, $lastIdRegister);
+                $this->makeDump($first_id, $last_id);
                 echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
 
                 echo('[    ] Importando dump da tabela');
@@ -81,15 +76,18 @@ class Expurgo
                 echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
 
                 echo('[    ] Verificando registros expurgados ');
-                $idOks = $this->checkDumpImported($firstIdRegister, $lastIdRegister);
-                echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                $imported = $this->checkDumpImported($first_id, $last_id);
 
 
-                if (count($idOks) > 0 )
+
+                if ($imported->total > 0 )
                 {
-                    echo('[    ] Excluindo registros ');
-                    $this->deleteDump($ids, $idOks, $firstIdRegister,$lastIdRegister );
                     echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                    echo('[    ] Excluindo registros ');
+                    $this->deleteDump($imported->first_id,$imported->last_id );
+                    echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                }else{
+                    echo ("\r[ ".Colorize::red()."Err".Colorize::clear()."]". PHP_EOL);
                 }
             }else {
 
@@ -101,6 +99,7 @@ class Expurgo
             }
 
         }else{
+            echo("\r[ ".Colorize::green()."OK".Colorize::clear().' ]');
             echo PHP_EOL;
             echo(Colorize::yellow());
             echo(str_pad("Info: Não existe itens a serem expurgado", 100, ' ', STR_PAD_BOTH));
@@ -117,36 +116,32 @@ class Expurgo
 
     private function importDump()
     {
-
         shell_exec('export MYSQL_PWD='.$this->dbTo->password.' && mysql -h '.$this->dbTo->host.' -u '.$this->dbTo->user.' --force -s -D '.$this->dbTo->db.'  <  '.$this->getFileDump());
     }
 
 
-    private  function checkDumpImported($firstIdRegister, $lastIdRegister)
+    private  function checkDumpImported($first_id, $last_id)
     {
-        $ids = [];
-        $registers = $this->dbTo->connect()->query("SELECT {$this->table->id} FROM {$this->table->name} where {$this->table->id} >= {$firstIdRegister} and {$this->table->id} <= '{$lastIdRegister}'")->fetchAll();
-
-        foreach ($registers as $register)
-        {
-            $ids[] = $register[$this->table->id];
-        }
-        return $ids;
+        $register = $this->dbTo->connect()->query("SELECT min({$this->table->id}) as first_id, max({$this->table->id}) as last_id, count({$this->table->id}) as total FROM {$this->table->name} where {$this->table->id} >= {$first_id} and {$this->table->id} <= '{$last_id}'")->fetchObject();
+        return (object)['first_id' => @$register->first_id, 'last_id' => @$register->last_id, 'total'  => @$register->total];
     }
 
 
-    private function deleteDump($ids, $idOks, $firstIdRegister,$lastIdRegister)
+    private function deleteDump($first_id,$last_id)
     {
-        $idDiff = array_diff($ids, $idOks);
-        $this->dbFrom->connect()->exec("set foreign_key_checks=0");
-        $this->dbFrom->connect()->exec("delete from  {$this->table->name} where {$this->table->id} >= {$firstIdRegister} and {$this->table->id} <= {$lastIdRegister} " . (count($idDiff) > 0 ? " and {$this->table->id} NOT IN(" . implode(',', $idDiff) . ")" : ""));
-        $this->dbFrom->connect()->exec("set foreign_key_checks=1");
+            if ($last_id > $first_id)
+            {
+
+                $this->dbFrom->connect()->exec("set foreign_key_checks=0");
+                $this->dbFrom->connect()->exec("delete from  {$this->table->name} where {$this->table->id} >= {$first_id} and {$this->table->id} <= {$last_id}");
+                $this->dbFrom->connect()->exec("set foreign_key_checks=1");
+            }
     }
 
 
-    private function makeDump($firstIdRegister, $lastIdRegister)
+    private function makeDump($first_id, $last_id)
     {
-        shell_exec('export MYSQL_PWD='.$this->dbFrom->password.' && mysqldump -h '.$this->dbFrom->host.' -u '.$this->dbFrom->user.' '.$this->dbFrom->db.' '.$this->table->name.' --quick  --no-create-info --single-transaction --where="'.$this->table->id.' >= '.$firstIdRegister.' and '.$this->table->id.' <= '.$lastIdRegister.'"  >  '.$this->getFileDump());
+        shell_exec('export MYSQL_PWD='.$this->dbFrom->password.' && mysqldump -h '.$this->dbFrom->host.' -u '.$this->dbFrom->user.' '.$this->dbFrom->db.' '.$this->table->name.' --quick  --no-create-info --single-transaction --where="'.$this->table->id.' >= '.$first_id.' and '.$this->table->id.' <= '.$last_id.'"  >  '.$this->getFileDump());
     }
 
 

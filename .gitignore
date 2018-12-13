@@ -5,3 +5,4 @@ composer.lock
 dump_*
 database.conf
 expurgo.log
+expurgo/
