@@ -60,8 +60,13 @@ class Expurgo
             if ($imported->total > 0 )
             {
                 echo('[    ] Excluindo itens ja expurgados anteriormente. ');
-                $this->deleteDump($imported->first_id,$imported->last_id);
-                echo (" | Excluidos {$imported->total} ({$imported->first_id}/{$imported->last_id}) \r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                if ($imported->last_id - $imported->first_id == $imported->total)
+                {
+                    $this->deleteDump($imported->first_id,$imported->last_id);
+                    echo (" | Excluidos {$imported->total} ({$imported->first_id}/{$imported->last_id}) \r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                }
+                echo (" | Não excluidos {$imported->total} ({$imported->first_id}/{$imported->last_id}) \r[ ".Colorize::red()."Err".Colorize::clear()." ]". PHP_EOL);
+
             }
 
             //verifica se sobrou dados a serem expurgado
