@@ -66,7 +66,7 @@ $tables[] = $table = new Table('steps', 'start');
 
 
 echo(Colorize::magenta(true).Colorize::bold());
-echo(Colorize::white().str_pad("Start: ".date("%Y-%m-%d %H:%i:%s"), 100, ' ', STR_PAD_BOTH));
+echo(Colorize::white().str_pad("Start: ".date("Y-m-d H:i:s"), 100, ' ', STR_PAD_BOTH));
 echo(Colorize::clear().PHP_EOL);
 
 echo(Colorize::yellow().Colorize::bold());
