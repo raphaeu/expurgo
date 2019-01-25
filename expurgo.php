@@ -64,6 +64,11 @@ $tables[] = $table = new Table('steps', 'start');
 
 // INICIO
 
+
+echo(Colorize::magenta(true).Colorize::bold());
+echo(Colorize::white().str_pad("Start: ".date('%Y-%m-%d %H:%i:%s'), 100, ' ', STR_PAD_BOTH));
+echo(Colorize::clear().PHP_EOL);
+
 echo(Colorize::yellow().Colorize::bold());
 echo(str_pad(' _______  __   __  _______  __   __  ______    _______  _______ ', 100, ' ', STR_PAD_BOTH).PHP_EOL);
 echo(str_pad('|       ||  |_|  ||       ||  | |  ||    _ |  |       ||       |', 100, ' ', STR_PAD_BOTH).PHP_EOL);
@@ -99,7 +104,10 @@ foreach($periods as $period) {
         }
 
     }
-
 }
+
+echo(Colorize::magenta(true).Colorize::bold());
+echo(Colorize::white().str_pad("End: ".date('%Y-%m-%d %H:%i:%s'), 100, ' ', STR_PAD_BOTH));
+echo(Colorize::clear().PHP_EOL);
 
 
