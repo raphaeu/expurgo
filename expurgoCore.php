@@ -7,7 +7,7 @@
  */
 use \raphaeu\Expurgo;
 use \raphaeu\Colorize;
-
+use \raphaeu\ParseFile;
 
 
 echo(Colorize::magenta(true).Colorize::bold());
