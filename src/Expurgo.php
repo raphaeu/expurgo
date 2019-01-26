@@ -41,8 +41,6 @@ class Expurgo
         //verifica id do ultimo registro
         echo('[    ] Verificando ultimo ID');
 
-        print_r($this->dbFrom);
-        print_r($this->dbTo);
 
         $registersFrom = $this->dbFrom->connect()->query($x= "SELECT min({$this->table->id}) as first_id, max({$this->table->id})  as last_id, count({$this->table->id}) as total FROM {$this->table->name} where {$this->table->fieldDateTime} >= '{$this->dateTimeStart}' and {$this->table->fieldDateTime} <= '{$this->dateTimeEnd}'")->fetchObject();
 
