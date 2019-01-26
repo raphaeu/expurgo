@@ -30,7 +30,7 @@ foreach($periods as $period) {
 
     echo(PHP_EOL);
     echo(Colorize::blue(true). str_pad(" ", 100, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
-    echo(Colorize::blue(true).Colorize::bold(). str_pad($period['name'], 101, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
+    echo(Colorize::blue(true).Colorize::bold(). str_pad($period['name'], 100, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
     echo(Colorize::blue(true).str_pad("Periodo " . $period['date']['from'] . " até " .  $period['date']['to'], 101, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
     echo(Colorize::blue(true).str_pad(" ", 100, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
     echo(PHP_EOL);
