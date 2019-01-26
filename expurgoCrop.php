@@ -18,7 +18,7 @@ use \raphaeu\Database;
 use \raphaeu\ParseFile;
 $onlyDump = true;
 ParseFile::setFile(__DIR__.'/database.conf');
-$dirDump = '/usr/zeus/backup';
+$dirDump = '/usr/zeus/backup/7dias';
 
 // BANDO DE DADOS
 $i++;// D-7
