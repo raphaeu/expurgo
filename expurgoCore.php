@@ -8,10 +8,12 @@
 use \raphaeu\Expurgo;
 use \raphaeu\Colorize;
 use \raphaeu\ParseFile;
-use \SebastianBergmann\Timer\Timer;
 
 echo(Colorize::magenta(true).Colorize::bold());
 echo(Colorize::white().str_pad("Start: ".date("Y-m-d H:i:s"), 100, ' ', STR_PAD_BOTH));
+echo(Colorize::clear().PHP_EOL);
+echo(Colorize::blue(true).Colorize::bold());
+echo(Colorize::white().str_pad("Folder: ".$dirDump, 100, ' ', STR_PAD_BOTH));
 echo(Colorize::clear().PHP_EOL);
 
 echo(Colorize::yellow().Colorize::bold());

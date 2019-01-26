@@ -37,3 +37,5 @@ $tables[] = $table = new Table('steps', 'start');
 
 // RUN
 include(__DIR__.'/expurgoCore.php');
+
+
