@@ -20,8 +20,9 @@ use \raphaeu\ParseFile;
 ParseFile::setFile(__DIR__.'/database.conf');
 
 // BANDO DE DADOS
-
+$onlyDump = false;
 $interval_days = 1;
+$dirDump = ParseFile::get('files', 'dump');
 
 $i=0; // D-1
 $periods[$i]['name'] = '1 dia';

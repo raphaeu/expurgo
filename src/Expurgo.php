@@ -18,6 +18,7 @@ class Expurgo
     private $dateTimeStart;
     private $dateTimeEnd;
     private $fileDump;
+    private $onlyDump = false;
 
 
     function __construct(Table $table, Database $dbFrom, Database $dbTo)
@@ -26,6 +27,11 @@ class Expurgo
         $this->dbFrom =$dbFrom;
         $this->dbTo =$dbTo;
         $this->validate();
+    }
+
+    public function setOnlyDump(bool $onlyDump)
+    {
+        $this->onlyDump = $onlyDump;
     }
 
     public function go()
@@ -77,23 +83,26 @@ class Expurgo
                 $this->makeDump($first_id, $last_id);
                 echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
 
-                echo('[    ] Importando dump da tabela');
-                $this->importDump();
-                echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-
-                echo('[    ] Verificando registros expurgados ');
-                $imported = $this->checkDumpImported($first_id, $last_id);
-
-
-
-                if ($imported->total > 0 )
+                if ($this->onlyDump == false)
                 {
+                    echo('[    ] Importando dump da tabela');
+                    $this->importDump();
                     echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-                    echo('[    ] Excluindo registros ');
-                    $this->deleteDump($imported->first_id,$imported->last_id );
-                    echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-                }else{
-                    echo ("\r[ ".Colorize::red()."Err".Colorize::clear()."]". PHP_EOL);
+
+                    echo('[    ] Verificando registros expurgados ');
+                    $imported = $this->checkDumpImported($first_id, $last_id);
+
+
+
+                    if ($imported->total > 0 )
+                    {
+                        echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                        echo('[    ] Excluindo registros ');
+                        $this->deleteDump($imported->first_id,$imported->last_id );
+                        echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                    }else{
+                        echo ("\r[ ".Colorize::red()."Err".Colorize::clear()."]". PHP_EOL);
+                    }
                 }
             }else {
 

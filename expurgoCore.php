@@ -8,7 +8,7 @@
 use \raphaeu\Expurgo;
 use \raphaeu\Colorize;
 use \raphaeu\ParseFile;
-
+use \SebastianBergmann\Timer\Timer;
 
 echo(Colorize::magenta(true).Colorize::bold());
 echo(Colorize::white().str_pad("Start: ".date("Y-m-d H:i:s"), 100, ' ', STR_PAD_BOTH));
@@ -26,6 +26,7 @@ echo(Colorize::clear().PHP_EOL);
 
 
 
+
 foreach($periods as $period) {
 
     echo(PHP_EOL);
@@ -39,9 +40,10 @@ foreach($periods as $period) {
         try {
 
             $expurgo = new Expurgo($table, $period['database']['from'], $period['database']['to']);
-            $expurgo->setFileDump(ParseFile::get('files', 'dump') . "/".str_replace(['-', ' ', ':'], '', $period['date']['from'])."_to_".str_replace(['-', ' ', ':'], '',$period['date']['to'])."_{$table->name}.sql");
+            $expurgo->setFileDump($dirDump . "/".str_replace(['-', ' ', ':'], '', $period['date']['from'])."_to_".str_replace(['-', ' ', ':'], '',$period['date']['to'])."_{$table->name}.sql");
             $expurgo->setDateTimeStart($period['date']['from']);
             $expurgo->setDateTimeEnd($period['date']['to']);
+            $expurgo->setOnlyDump($onlyDump);
             $expurgo->go();
         } catch (Exception $e) {
             file_put_contents(ParseFile::get('files', 'log'), PHP_EOL . "[" . date('Y-m-d H:i:s') . "][{$table->name}] " . $e->getMessage(), FILE_APPEND);
@@ -50,9 +52,8 @@ foreach($periods as $period) {
 
     }
 }
-
 echo(Colorize::magenta(true).Colorize::bold());
-echo(Colorize::white().str_pad("End: ".date('%Y-%m-%d %H:%i:%s'), 100, ' ', STR_PAD_BOTH));
+echo(Colorize::white().str_pad("End: ".date('Y-m-d H:i:s'), 100, ' ', STR_PAD_BOTH));
 echo(Colorize::clear().PHP_EOL);
 
 

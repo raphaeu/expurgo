@@ -16,8 +16,9 @@ require 'vendor/autoload.php';
 use \raphaeu\Table;
 use \raphaeu\Database;
 use \raphaeu\ParseFile;
-
+$onlyDump = true;
 ParseFile::setFile(__DIR__.'/database.conf');
+$dirDump = ParseFile::get('files', 'dump');
 
 // BANDO DE DADOS
 $i++;// D-7
