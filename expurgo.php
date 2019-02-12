@@ -21,7 +21,7 @@ ParseFile::setFile(__DIR__.'/database.conf');
 
 // BANDO DE DADOS
 $onlyDump = false;
-$interval_days = 1;
+$interval_days = 10;
 $dirDump = ParseFile::get('files', 'dump');
 
 $i=0; // D-1
@@ -33,22 +33,22 @@ $periods[$i]['database']['to'] = new Database(ParseFile::get('d7', 'host'), Pars
 
 $i++;// D-7
 $periods[$i]['name'] = '7 dias';
-$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(7 + $interval_days)." days"));
-$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 7 )." days"));
+$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(8 + $interval_days)." days"));
+$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 8 )." days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d7', 'host'), ParseFile::get('d7', 'user'), ParseFile::get('d7', 'password'), ParseFile::get('d7', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('d30', 'host'), ParseFile::get('d30', 'user'), ParseFile::get('d30', 'password'), ParseFile::get('d30', 'db'));
 
 $i++;// D-30
 $periods[$i]['name'] = '30 dias';
-$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(30 + $interval_days)." days"));
-$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 30 )." days"));
+$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(31 + $interval_days)." days"));
+$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 31 )." days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d30', 'host'), ParseFile::get('d30', 'user'), ParseFile::get('d30', 'password'), ParseFile::get('d30', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('d90', 'host'), ParseFile::get('d90', 'user'), ParseFile::get('d90', 'password'), ParseFile::get('d90', 'db'));
 
 $i++;// D-90
 $periods[$i]['name'] = '90 dias';
-$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(90 + $interval_days)." days"));
-$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 90 )." days"));
+$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(91 + $interval_days)." days"));
+$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 91 )." days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d90', 'host'), ParseFile::get('d90', 'user'), ParseFile::get('d90', 'password'), ParseFile::get('d90', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('history', 'host'), ParseFile::get('history', 'user'), ParseFile::get('history', 'password'), ParseFile::get('history', 'db'));
 
