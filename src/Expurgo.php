@@ -89,7 +89,9 @@ class Expurgo
             echo('[    ] Verificando registros expurgados ');
             if ($this->checkDumpImported($first_id, $last_id))
             {
-                echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                Timer::start();
+                echo (" (".Timer::secondsToTimeString(Timer::stop()) .")\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+                Timer::start();
                 echo('[    ] Excluindo registros ');
                 $this->deleteDump($first_id,$last_id);
                 echo (" (".Timer::secondsToTimeString(Timer::stop()) .") \r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
