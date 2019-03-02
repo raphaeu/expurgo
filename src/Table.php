@@ -13,18 +13,12 @@ class Table
 {
     public $name;
     public $fieldDateTime;
-    public $id = 'id';
+    public $id;
 
-    function __construct($name, $fieldDateTime)
+    function __construct($name, $fieldDateTime, $id)
     {
         $this->name = $name;
         $this->fieldDateTime = $fieldDateTime;
+        $this->id  = $id?$id:'id';
     }
-
-    public function setId(string $id)
-    {
-        $this->id = $id;
-    }
-
-
 }

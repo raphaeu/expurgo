@@ -26,40 +26,32 @@ $dirDump = ParseFile::get('files', 'dump');
 
 $i=0; // D-1
 $periods[$i]['name'] = '1 dia';
-$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(1 + $interval_days)." days"));
-$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 1 )." days"));
+$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-1 days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d1', 'host'), ParseFile::get('d1', 'user'), ParseFile::get('d1', 'password'), ParseFile::get('d1', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('d7', 'host'), ParseFile::get('d7', 'user'), ParseFile::get('d7', 'password'), ParseFile::get('d7', 'db'));
 
-$i++;// D-7
-$periods[$i]['name'] = '7 dias';
-$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(8 + $interval_days)." days"));
-$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 8 )." days"));
+$i=1; // D-7
+$periods[$i]['name'] = '7 dia';
+$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-8 days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d7', 'host'), ParseFile::get('d7', 'user'), ParseFile::get('d7', 'password'), ParseFile::get('d7', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('d30', 'host'), ParseFile::get('d30', 'user'), ParseFile::get('d30', 'password'), ParseFile::get('d30', 'db'));
 
-$i++;// D-30
-$periods[$i]['name'] = '30 dias';
-$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(31 + $interval_days)." days"));
-$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 31 )." days"));
+$i=2; // D-30
+$periods[$i]['name'] = '30 dia';
+$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-31 days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d30', 'host'), ParseFile::get('d30', 'user'), ParseFile::get('d30', 'password'), ParseFile::get('d30', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('d90', 'host'), ParseFile::get('d90', 'user'), ParseFile::get('d90', 'password'), ParseFile::get('d90', 'db'));
 
-$i++;// D-90
-$periods[$i]['name'] = '90 dias';
-$periods[$i]['date']['from'] = date('Y-m-d 23:59:59', strtotime("-".(91 + $interval_days)." days"));
-$periods[$i]['date']['to'] = date('Y-m-d 23:59:59', strtotime("-".( 91 )." days"));
+$i=3; // D-90
+$periods[$i]['name'] = '90 dia';
+$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-91 days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d90', 'host'), ParseFile::get('d90', 'user'), ParseFile::get('d90', 'password'), ParseFile::get('d90', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('history', 'host'), ParseFile::get('history', 'user'), ParseFile::get('history', 'password'), ParseFile::get('history', 'db'));
 
 
+
 // TABELAS
-
-
-$tables[] = $table = new Table('integration_results', 'created_at');
-$tables[] = $table = new Table('interactions', 'start');
-$tables[] = $table = new Table('calls', 'start');
-$tables[] = $table = new Table('steps', 'start');
+$table = new Table($argv[1], $argv[2], @$argv[3]);
 
 // RUN
 include(__DIR__.'/expurgoCore.php');

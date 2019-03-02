@@ -15,8 +15,7 @@ class Expurgo
     private $table;
     private $dbFrom;
     private $dbTo;
-    private $dateTimeStart;
-    private $dateTimeEnd;
+    private $deadline;
     private $fileDump;
     private $onlyDump = false;
 
@@ -29,15 +28,13 @@ class Expurgo
         $this->validate();
     }
 
-    public function setOnlyDump(bool $onlyDump)
+    public function setOnlyDump($onlyDump)
     {
         $this->onlyDump = $onlyDump;
     }
 
     public function go()
     {
-
-
         echo(Colorize::white(1).Colorize::bold().Colorize::black());
         echo(str_pad("{$this->table->name}", 100, ' ', STR_PAD_BOTH));
         echo(Colorize::clear().PHP_EOL.PHP_EOL);
@@ -45,72 +42,59 @@ class Expurgo
         Timer::start();
 
         //verifica id do ultimo registro
+        Timer::start();
         echo('[    ] Verificando ultimo ID');
+        $sql="
+            SELECT
+              tmp.max as first_id
+              ,tmp.min as last_id
+              ,tmp.min  - tmp.max as total
+            FROM (
+              SELECT
+                (SELECT {$this->table->id}
+                 FROM {$this->table->name}
+                 WHERE {$this->table->fieldDateTime} <= '{$this->deadline} 23:59:59'
+                 ORDER BY {$this->table->fieldDateTime} DESC
+                 LIMIT 1) AS min,
+                (SELECT {$this->table->id}
+                 FROM {$this->table->name}
+                 WHERE {$this->table->fieldDateTime} <= '{$this->deadline} 23:59:59'
+                 ORDER BY {$this->table->fieldDateTime} ASC
+                 LIMIT 1) AS max
+            ) as tmp
+        ";
 
 
-        $registersFrom = $this->dbFrom->connect()->query($x= "SELECT min({$this->table->id}) as first_id, max({$this->table->id})  as last_id, count({$this->table->id}) as total FROM {$this->table->name} where {$this->table->fieldDateTime} >= '{$this->dateTimeStart}' and {$this->table->fieldDateTime} <= '{$this->dateTimeEnd}'")->fetchObject();
+        $registersFrom = $this->dbFrom->connect()->query($sql)->fetchObject();
 
-
-
-        $first_id = @$registersFrom->first_id;
-        $last_id = @$registersFrom->last_id;
-        $total  = @$registersFrom->total;
+        $first_id = $registersFrom->first_id;
+        $last_id = $registersFrom->last_id;
+        $total  = $registersFrom->total;
 
         if ($total > 0)
         {
-            echo("(".Colorize::bold().$first_id.Colorize::clear()."/".Colorize::bold().$last_id.Colorize::clear().") | Total register: ".Colorize::bold().$total.Colorize::clear()."  \r[ ".Colorize::green()."OK".Colorize::clear()." ] " . PHP_EOL);
+            echo("(".Colorize::bold().$first_id.Colorize::clear()."/".Colorize::bold().$last_id.Colorize::clear().") | Total register: ".Colorize::bold().$total.Colorize::clear()." (".Timer::secondsToTimeString(Timer::stop()) .")  \r[ ".Colorize::green()."OK".Colorize::clear()." ] ". PHP_EOL);
 
-            echo('[    ] Verificando itens no destino ');
-            $imported = $this->checkDumpImported($first_id, $last_id);
-            echo (" | Total ".Colorize::bold().$imported->total.Colorize::clear()."\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+            Timer::start();
+            echo('[    ] Gerando dump da tabela');
+            $this->makeDump($first_id, $last_id);
+            echo (" (".Timer::secondsToTimeString(Timer::stop()) .")\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
 
-            if ($imported->total > 0 )
+            Timer::start();
+            echo('[    ] Importando dump da tabela');
+            $this->importDump();
+            echo (" (".Timer::secondsToTimeString(Timer::stop()) .") \r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+
+            Timer::start();
+            echo('[    ] Verificando registros expurgados ');
+            if ($this->checkDumpImported($first_id, $last_id))
             {
-                echo('[    ] Excluindo itens ja expurgados anteriormente. ');
-                if ($imported->last_id - $imported->first_id == $imported->total)
-                {
-                    $this->deleteDump($imported->first_id,$imported->last_id);
-                    echo (" | Excluidos {$imported->total} ({$imported->first_id}/{$imported->last_id}) \r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-                }
-                echo (" | Não excluidos {$imported->total} ({$imported->first_id}/{$imported->last_id}) \r[ ".Colorize::red()."Err".Colorize::clear()." ]". PHP_EOL);
-
-            }
-
-            //verifica se sobrou dados a serem expurgado
-            if ($total > $imported->total )
-            {
-                echo('[    ] Gerando dump da tabela');
-                $this->makeDump($first_id, $last_id);
                 echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-
-                if ($this->onlyDump == false)
-                {
-                    echo('[    ] Importando dump da tabela');
-                    $this->importDump();
-                    echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-
-                    echo('[    ] Verificando registros expurgados ');
-                    $imported = $this->checkDumpImported($first_id, $last_id);
-
-
-
-                    if ($imported->total > 0 )
-                    {
-                        echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-                        echo('[    ] Excluindo registros ');
-                        $this->deleteDump($imported->first_id,$imported->last_id );
-                        echo ("\r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
-                    }else{
-                        echo ("\r[ ".Colorize::red()."Err".Colorize::clear()."]". PHP_EOL);
-                    }
-                }
-            }else {
-
-                echo PHP_EOL;
-                echo(Colorize::yellow());
-                echo(str_pad("Info: Não sobrou itens a serem expurgado!", 100, ' ', STR_PAD_BOTH));
-                echo(Colorize::clear());
-                echo PHP_EOL.PHP_EOL;
+                echo('[    ] Excluindo registros ');
+                $this->deleteDump($first_id,$last_id);
+                echo (" (".Timer::secondsToTimeString(Timer::stop()) .") \r[ ".Colorize::green()."OK".Colorize::clear()." ]". PHP_EOL);
+            }else{
+                echo (" (".Timer::secondsToTimeString(Timer::stop()) .") \r[ ".Colorize::red()."Err".Colorize::clear()."]". PHP_EOL);
             }
 
         }else{
@@ -124,7 +108,9 @@ class Expurgo
 
 
         echo(PHP_EOL.PHP_EOL.Colorize::black(1).Colorize::white());
-        echo(str_pad(Timer::timeSinceStartOfRequest(), 100, ' ', STR_PAD_BOTH));
+
+        echo(str_pad(Timer::secondsToTimeString(Timer::stop()) , 100, ' ', STR_PAD_BOTH));
+
         echo(Colorize::clear().PHP_EOL.PHP_EOL);
 
     }
@@ -137,8 +123,8 @@ class Expurgo
 
     private  function checkDumpImported($first_id, $last_id)
     {
-        $register = $this->dbTo->connect()->query("SELECT min({$this->table->id}) as first_id, max({$this->table->id}) as last_id, count({$this->table->id}) as total FROM {$this->table->name} where {$this->table->id} >= {$first_id} and {$this->table->id} <= '{$last_id}'")->fetchObject();
-        return (object)['first_id' => @$register->first_id, 'last_id' => @$register->last_id, 'total'  => @$register->total];
+        $result = $this->dbTo->connect()->query("SELECT if (count({$this->table->id})=2,1,0) AS checkDumpImported FROM {$this->table->name} WHERE {$this->table->id} IN({$first_id} ,{$last_id})")->fetchObject();
+        return $result->checkDumpImported;
     }
 
 
@@ -146,7 +132,6 @@ class Expurgo
     {
             if ($last_id > $first_id)
             {
-
                 $this->dbFrom->connect()->exec("set foreign_key_checks=0");
                 $this->dbFrom->connect()->exec("delete from  {$this->table->name} where {$this->table->id} >= {$first_id} and {$this->table->id} <= {$last_id}");
                 $this->dbFrom->connect()->exec("set foreign_key_checks=1");
@@ -171,15 +156,11 @@ class Expurgo
     }
 
 
-    public function setDateTimeEnd($dateTimeEnd)
+    public function setDeadline($deadline)
     {
-        $this->dateTimeEnd = $dateTimeEnd;
+        $this->deadline = $deadline;
     }
 
-    public function setDateTimeStart($dateTimeStart)
-    {
-        $this->dateTimeStart = $dateTimeStart;
-    }
 
     private function validate()
     {

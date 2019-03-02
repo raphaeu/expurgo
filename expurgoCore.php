@@ -34,25 +34,22 @@ foreach($periods as $period) {
     echo(PHP_EOL);
     echo(Colorize::blue(true). str_pad(" ", 100, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
     echo(Colorize::blue(true).Colorize::bold(). str_pad($period['name'], 100, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
-    echo(Colorize::blue(true).str_pad("Periodo " . $period['date']['from'] . " até " .  $period['date']['to'], 101, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
+    echo(Colorize::blue(true).str_pad("Deadline: " . $period['date']['deadline'] , 100, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
     echo(Colorize::blue(true).str_pad(" ", 100, ' ', STR_PAD_BOTH).Colorize::clear().PHP_EOL);
     echo(PHP_EOL);
 
-    foreach ($tables as $table) {
-        try {
+    try {
 
-            $expurgo = new Expurgo($table, $period['database']['from'], $period['database']['to']);
-            $expurgo->setFileDump($dirDump . "/".str_replace(['-', ' ', ':'], '', $period['date']['from'])."_to_".str_replace(['-', ' ', ':'], '',$period['date']['to'])."_{$table->name}.sql");
-            $expurgo->setDateTimeStart($period['date']['from']);
-            $expurgo->setDateTimeEnd($period['date']['to']);
-            $expurgo->setOnlyDump($onlyDump);
-            $expurgo->go();
-        } catch (Exception $e) {
-            file_put_contents(ParseFile::get('files', 'log'), PHP_EOL . "[" . date('Y-m-d H:i:s') . "][{$table->name}] " . $e->getMessage(), FILE_APPEND);
-            echo("Erro:" . $e->getMessage());
-        }
-
+        $expurgo = new Expurgo($table, $period['database']['from'], $period['database']['to']);
+        $expurgo->setFileDump($dirDump . "/".str_replace(['-', ' ', ':'], '', $period['date']['deadline'])."_{$table->name}.sql");
+        $expurgo->setDeadline($period['date']['deadline']);
+        $expurgo->setOnlyDump($onlyDump);
+        $expurgo->go();
+    } catch (Exception $e) {
+        file_put_contents(ParseFile::get('files', 'log'), PHP_EOL . "[" . date('Y-m-d H:i:s') . "][{$table->name}] " . $e->getMessage(), FILE_APPEND);
+        echo("Erro:" . $e->getMessage());
     }
+
 }
 echo(Colorize::magenta(true).Colorize::bold());
 echo(Colorize::white().str_pad("End: ".date('Y-m-d H:i:s'), 100, ' ', STR_PAD_BOTH));
