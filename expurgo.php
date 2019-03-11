@@ -38,13 +38,13 @@ $periods[$i]['database']['to'] = new Database(ParseFile::get('d30', 'host'), Par
 
 $i=2; // D-30
 $periods[$i]['name'] = '30 dia';
-$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-31 days"));
+$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-39 days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d30', 'host'), ParseFile::get('d30', 'user'), ParseFile::get('d30', 'password'), ParseFile::get('d30', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('d90', 'host'), ParseFile::get('d90', 'user'), ParseFile::get('d90', 'password'), ParseFile::get('d90', 'db'));
 
 $i=3; // D-90
 $periods[$i]['name'] = '90 dia';
-$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-91 days"));
+$periods[$i]['date']['deadline'] = date('Y-m-d', strtotime("-139 days"));
 $periods[$i]['database']['from'] = new Database(ParseFile::get('d90', 'host'), ParseFile::get('d90', 'user'), ParseFile::get('d90', 'password'), ParseFile::get('d90', 'db'));
 $periods[$i]['database']['to'] = new Database(ParseFile::get('history', 'host'), ParseFile::get('history', 'user'), ParseFile::get('history', 'password'), ParseFile::get('history', 'db'));
 
